@@ -6,12 +6,27 @@ Window::Window()
 {
 	width = 800;
 	height = 600;
+	xChange = 0.0f;
+	yChange = 0.0f;
+
+	for (size_t i = 0; i < 1024; i++)
+	{
+		keys[i] = 0;
+	}
 }
 
 Window::Window(GLint windowWidth, GLint windowHeight)
 {
 	width = windowWidth;
 	height = windowHeight;
+	xChange = 0.0f;
+	yChange = 0.0f;
+
+	for (size_t i = 0; i < 1024; i++)
+	{
+		keys[i] = 0;
+	}
+
 }
 
 int Window::initialize()
@@ -47,6 +62,11 @@ int Window::initialize()
 	//set context for GLEW to use
 	glfwMakeContextCurrent(mainWindow);
 
+	// Handle key and mouse inputs
+	createCallbacks();
+	// disable cursor on screen
+	glfwSetInputMode(mainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	// allow modern extension features
 	glewExperimental = GL_TRUE;
 
@@ -62,6 +82,74 @@ int Window::initialize()
 
 	// set up viewport size
 	glViewport(0, 0, bufferWidth, bufferHeight); // size of drawing canvas
+
+	glfwSetWindowUserPointer(mainWindow, this);
+}
+
+void Window::handleKeys(GLFWwindow * window, int key, int code, int action, int mode)
+{
+	Window* theWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	{
+		// set the window to close manually
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+
+	if (key >= 0 && key < 1024)
+	{
+		if (action == GLFW_PRESS)
+		{
+			theWindow->keys[key] = true;
+			//std::cout << "Pressed: " << key << std::endl;
+		}
+		else if (action == GLFW_RELEASE)
+		{
+			theWindow->keys[key] = false;
+			//std::cout << "Released: " << key << std::endl;
+		}
+	}
+}
+
+void Window::handleMouse(GLFWwindow * window, double xPos, double yPos)
+{
+	Window* theWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+	if (theWindow->mouseFirstMoved)
+	{
+		theWindow->lastX = xPos;
+		theWindow->lastY = yPos;
+		theWindow->mouseFirstMoved = false;
+	}
+
+	theWindow->xChange = xPos - theWindow->lastX;
+	theWindow->yChange = theWindow->lastY - yPos;
+
+	theWindow->lastX = xPos;
+	theWindow->lastY = yPos;
+
+	//std::cout << "x: " << theWindow->xChange << " y: " << theWindow->yChange << std::endl;
+}
+
+void Window::createCallbacks()
+{
+	// when key is pressed on main window, call back to handle keys method
+	glfwSetKeyCallback(mainWindow, handleKeys);
+	glfwSetCursorPosCallback(mainWindow, handleMouse);
+}
+
+GLfloat Window::getXChange()
+{
+	GLfloat theChange = xChange;
+	xChange = 0.0f;
+	return theChange;
+}
+
+GLfloat Window::getYChange()
+{
+	GLfloat theChange = yChange;
+	yChange = 0.0f;
+	return theChange;
 }
 
 

@@ -7,6 +7,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Window.h"
+#include "Camera.h"
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 #include <glm/glm.hpp> 
@@ -15,6 +16,9 @@
 
 std::vector<Mesh*> meshList;
 std::vector<Shader> shaderList;
+
+GLfloat deltaTime = 0.0f;
+GLfloat lastTime = 0.0f;
 
 const float toRadians = 3.141592651 / 180.0f;
 
@@ -25,6 +29,7 @@ static const char* vShader = "Shaders/shader.vert";
 static const char* fShader = "Shaders/shader.frag";
 
 Window mainWindow;
+Camera camera;
 
 void CreateObjects()
 {
@@ -69,17 +74,26 @@ int main()
 	CreateObjects();
 	CreateShaders();
 
-	GLuint uniformProjection = 0, uniformModel = 0;
+	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.5f);
+
+	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0;
 
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / (GLfloat)mainWindow.getBufferHeight(), 0.1f, 100.0f);
 
 	// Loop until window closes
 	while (!mainWindow.getShouldClose()) // which window should close
 	{
+
+		GLfloat now = glfwGetTime();
+		deltaTime = now - lastTime;
+		lastTime = now;
 		// Get and handle user input events...
 
 		// check if any events occured
 		glfwPollEvents();
+
+		camera.keyControl(mainWindow.getsKeys(), deltaTime);
+		camera.mouseContol(mainWindow.getXChange(), mainWindow.getYChange());
 
 		// clear the window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -89,6 +103,7 @@ int main()
 		shaderList[0].UseShader();
 		uniformModel = shaderList[0].GetModelLocation();
 		uniformProjection = shaderList[0].GetProjectionLocation();
+		uniformView = shaderList[0].GetViewLocation();
 
 		glm::mat4 model(1.0f);
 		
@@ -101,6 +116,7 @@ int main()
 		// sets the value of the uniform, uniformModel holds the id of uniform
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
 
 		meshList[0]->RenderMesh();
 

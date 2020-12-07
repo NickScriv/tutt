@@ -11,6 +11,15 @@ public:
 
 	int initialize();
 
+	// passing array of keys, DANGEROUS
+	bool* getsKeys()
+	{
+		return keys;
+	}
+
+	GLfloat getXChange();
+	GLfloat getYChange();
+
 	GLint getBufferWidth()
 	{
 		return bufferWidth;
@@ -35,5 +44,18 @@ public:
 private:
 	GLFWwindow *mainWindow;
 	GLint width, height, bufferWidth, bufferHeight;
+	bool keys[1024];
+
+	GLfloat lastX;
+	GLfloat lastY;
+	GLfloat xChange;
+	GLfloat yChange;
+	bool mouseFirstMoved;
+
+
+	// must be static because it will be passed into a call back
+	static void handleKeys(GLFWwindow * window, int key, int code, int action, int mode);
+	static void handleMouse(GLFWwindow * window, double xPos, double yPos);
+	void createCallbacks();
 };
 
