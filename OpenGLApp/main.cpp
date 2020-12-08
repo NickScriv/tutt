@@ -1,4 +1,7 @@
 
+#define STB_IMAGE_IMPLEMENTATION
+
+
 #include "pch.h"
 #include <iostream>
 #include <string>
@@ -13,10 +16,16 @@
 #include <glm/glm.hpp> 
 #include <glm/gtc/matrix_transform.hpp> 
 #include <glm/gtc/type_ptr.hpp>  
+#include "Texture.h"
 
+
+#include "Light.h"
+// usually defined in mesh
+Texture brick;
+Texture dirt;
 std::vector<Mesh*> meshList;
 std::vector<Shader> shaderList;
-
+Light mainLight;
 GLfloat deltaTime = 0.0f;
 GLfloat lastTime = 0.0f;
 
@@ -40,18 +49,19 @@ void CreateObjects()
 		0, 1, 2,
 	};
 	GLfloat vertices[] = {
-		-1.0f, -1.0f, 0.0f,
-		0.0f, -1.0f, 1.0f,
-		1.0f, -1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f
+		// x     y     z       u       v
+		-1.0f, -1.0f, 0.0f,   0.0f,   0.0f,
+		0.0f, -1.0f, 1.0f,    0.5f,   0.0f,
+		1.0f, -1.0f, 0.0f,   1.0f,   0.0f,
+		0.0f, 1.0f, 0.0f,    0.5f,   1.0f
 	};
 
 	Mesh *obj2 = new Mesh();
-	obj2->CreateMesh(vertices, indicies, 12, 12);
+	obj2->CreateMesh(vertices, indicies, 20, 12);
 	meshList.push_back(obj2);
 
 	Mesh *obj1 = new Mesh();
-	obj1->CreateMesh(vertices, indicies, 12, 12);
+	obj1->CreateMesh(vertices, indicies, 20, 12);
 	meshList.push_back(obj1);
 	
 }
@@ -76,7 +86,13 @@ int main()
 
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.5f);
 
-	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0;
+	brick = Texture("Textures/brick.png");
+	brick.LoadTexture();
+	dirt = Texture("Textures/dirt.png");
+	dirt.LoadTexture();
+	mainLight = Light(1.0f, 1.0f, 1.0f, 0.2f);
+
+	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformAmbientIntensity = 0, uniformAmbientColor = 0;
 
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / (GLfloat)mainWindow.getBufferHeight(), 0.1f, 100.0f);
 
@@ -104,6 +120,10 @@ int main()
 		uniformModel = shaderList[0].GetModelLocation();
 		uniformProjection = shaderList[0].GetProjectionLocation();
 		uniformView = shaderList[0].GetViewLocation();
+		uniformAmbientColor = shaderList[0].GetAmbientColorLocation();
+		uniformAmbientIntensity = shaderList[0].GetAmbientIntensityLocation();
+
+		mainLight.UseLight(uniformAmbientIntensity, uniformAmbientColor);
 
 		glm::mat4 model(1.0f);
 		
@@ -117,7 +137,7 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
-
+		brick.UseTexture();
 		meshList[0]->RenderMesh();
 
 		model = glm::mat4(1.0f);
@@ -125,6 +145,7 @@ int main()
 		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		dirt.UseTexture();
 		meshList[1]->RenderMesh();
 
 
