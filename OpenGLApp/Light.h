@@ -6,13 +6,12 @@ class Light
 {
 public:
 	Light();
-	Light(GLfloat red, GLfloat green, GLfloat blue, GLfloat aIntesnity );
+	Light(GLfloat red, GLfloat green, GLfloat blue, GLfloat aIntesnity, GLfloat dIntensity);
 	~Light();
 
-	void UseLight(GLfloat ambientIntensityLoc, GLfloat ambientColorLoc);
-
-private:
+protected:
 	glm::vec3 color;
 	GLfloat ambientIntensity;
+	GLfloat diffuseIntensity;
 };
 

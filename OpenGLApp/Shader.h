@@ -4,6 +4,9 @@
 #include<string>
 #include<fstream>
 #include<GL\glew.h>
+#include "DirectionalLight.h"
+#include "PointLight.h"
+#include "CommomValues.h"
 class Shader
 {
 public:
@@ -18,6 +21,15 @@ public:
 	GLuint GetViewLocation();
 	GLuint GetAmbientIntensityLocation();
 	GLuint GetAmbientColorLocation();
+	GLuint GetDiffuseIntensityLocation();
+	GLuint GetDirectionLocation();
+	GLuint GetSpecularIntensityLocation();
+	GLuint GetShininessLocation();
+	GLuint GetEyePosLocation();
+
+	void SetDirectionalLight(DirectionalLight * dLight);
+	void SetPointLights(PointLight *pLight, unsigned int lightCount);
+
 
 	// unassigns current shader
 	static void ResetShader()
@@ -31,7 +43,29 @@ public:
 	~Shader();
 
 private:
-	GLuint shaderID, uniformProjection, uniformModel, uniformView, uniformAmbientIntensity, uniformAmbientColor;
+	int pointLightCount;
+	GLuint shaderID, uniformProjection, uniformModel, uniformView;
+	GLuint uniformSpecularIntensity, uniformShininess, uniformEyePos;
+	GLuint uniformPointLightCount;
+
+	struct {
+		GLuint uniformColor;
+		GLuint uniformAmbientIntensity;
+		GLuint uniformDiffuseIntensity;
+		GLuint uniformDirection;
+	}uniformDirectionalLight;
+
+	// can have multiple point lights
+	struct {
+		GLuint uniformColor;
+		GLuint uniformAmbientIntensity;
+		GLuint uniformDiffuseIntensity;
+		GLuint uniformPosition;
+		GLuint uniformConstant;
+		GLuint uniformLinear;
+		GLuint uniformExponent;
+	}uniformPointLight[MAX_POINT_LIGHTS];
+
 
 	void CompileShader(const char* vertexCode, const char* fragmentCode);
 	void AddShader(GLuint program, const char* shaderCode, GLenum shaderType);

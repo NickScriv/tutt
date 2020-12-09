@@ -12,6 +12,7 @@ public:
 	Camera();
 	~Camera();
 
+	glm::vec3 getCamPos();
 	glm::mat4 calculateViewMatrix();
 
 	void keyControl(bool *keys, GLfloat deltaTime);

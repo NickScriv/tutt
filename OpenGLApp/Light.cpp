@@ -1,24 +1,22 @@
 #include "Light.h"
+#include <iostream>
 
 Light::Light()
 {
 	color = glm::vec3(1.0f, 1.0f, 1.0f);
 	ambientIntensity = 1.0f;
+	diffuseIntensity = 0.0f;
 }
 
-Light::Light(GLfloat red, GLfloat green, GLfloat blue, GLfloat aIntesnity)
+Light::Light(GLfloat red, GLfloat green, GLfloat blue, GLfloat aIntesnity, GLfloat dIntensity)
 {
 	color = glm::vec3(red, green, blue);
 	ambientIntensity = aIntesnity;
+	diffuseIntensity = dIntensity;
 }
 Light::~Light()
 {
 
 }
 
-void Light::UseLight(GLfloat ambientIntensityLoc, GLfloat ambientColorLoc)
-{
-	// bind both uniforms to both IDs
-	glUniform3f(ambientColorLoc, color.x, color.y, color.z);
-	glUniform1f(ambientIntensityLoc, ambientIntensity);
-}
+
