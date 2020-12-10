@@ -7,6 +7,7 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "CommomValues.h"
+#include "SpotLight.h"
 class Shader
 {
 public:
@@ -29,6 +30,7 @@ public:
 
 	void SetDirectionalLight(DirectionalLight * dLight);
 	void SetPointLights(PointLight *pLight, unsigned int lightCount);
+	void SetSpotLights(SpotLight *sLight, unsigned int lightCount);
 
 
 	// unassigns current shader
@@ -44,9 +46,11 @@ public:
 
 private:
 	int pointLightCount;
+	int spotLightCount;
 	GLuint shaderID, uniformProjection, uniformModel, uniformView;
 	GLuint uniformSpecularIntensity, uniformShininess, uniformEyePos;
 	GLuint uniformPointLightCount;
+	GLuint uniformSpotLightCount;
 
 	struct {
 		GLuint uniformColor;
@@ -65,6 +69,18 @@ private:
 		GLuint uniformLinear;
 		GLuint uniformExponent;
 	}uniformPointLight[MAX_POINT_LIGHTS];
+
+	struct {
+		GLuint uniformColor;
+		GLuint uniformAmbientIntensity;
+		GLuint uniformDiffuseIntensity;
+		GLuint uniformPosition;
+		GLuint uniformDirection;
+		GLuint uniformEdge;
+		GLuint uniformConstant;
+		GLuint uniformLinear;
+		GLuint uniformExponent;
+	}uniformSpotLight[MAX_SPOT_LIGHTS];
 
 
 	void CompileShader(const char* vertexCode, const char* fragmentCode);

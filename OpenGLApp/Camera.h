@@ -17,6 +17,10 @@ public:
 
 	void keyControl(bool *keys, GLfloat deltaTime);
 	void mouseContol(GLfloat xChangeStart, GLfloat yChangeStart);
+	glm::vec3 getCameraDirection()
+	{
+		return glm::normalize(forward);
+	}
 
 private:
 	glm::vec3 position;

@@ -21,6 +21,11 @@
 #include "DirectionalLight.h"
 #include "CommomValues.h"
 #include "PointLight.h"
+#include "SpotLight.h"
+#include <assimp/Importer.hpp>
+#include "Model.h"
+
+Model heli;
 
 // usually defined in mesh
 Texture brick;
@@ -33,6 +38,7 @@ GLfloat lastTime = 0.0f;
 Material shinyMaterial;
 Material dullMaterial;
 PointLight pointLights[MAX_POINT_LIGHTS];
+SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 const float toRadians = 3.141592651 / 180.0f;
 
@@ -145,28 +151,60 @@ int main()
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 5.0f, 0.5f);
 
 	brick = Texture("Textures/brick.png");
-	brick.LoadTexture();
+	brick.LoadTextureA();
 	dirt = Texture("Textures/dirt.png");
-	dirt.LoadTexture();
+	dirt.LoadTextureA();
 	plain = Texture("Textures/plain.png");
-	plain.LoadTexture();
+	plain.LoadTextureA();
 
 	shinyMaterial = Material(1.0f, 32.0f);
 	dullMaterial = Material(0.3f, 4.0f);
-	DirectionalLight mainLight(0.0f, 0.0f, 0.0f, 0.2f, 1.0f,
-		              2.0f, -1.0f, -2.0f);
+
+	heli = Model();
+	heli.LoadModel("Models/chopper.obj");
+
+
+	DirectionalLight mainLight(1.0f, 1.0f, 1.0f, 
+						0.3f, 0.2f,
+		              0.0f, -1.0f, 0.0f);
 
 	unsigned int pointLightCount = 0;
 
-	pointLights[0] = PointLight(0.0f, 0.0f, 1.0f, 0.1f, 0.4f, 4.0f, 0.0f, 0.0f, 0.3f, 0.2f, 0.1f);
+	pointLights[0] = PointLight(0.0f, 0.0f, 1.0f, 
+		0.2f, 0.1f, 
+		0.0f, 13.0f, 0.0f, 
+		0.3f, 0.2f, 0.1f);
 	pointLightCount++;
 
-	pointLights[1] = PointLight(0.0f, 1.0f, 0.0f, 0.1f, 1.0f, -4.0f, 2.0f, 0.0f, 0.3f, 0.1f, 0.1f);
+	pointLights[1] = PointLight(0.0f, 1.0f, 0.0f,
+		0.0f, 0.1f,
+		-4.0f, 2.0f, 0.0f,
+		0.3f, 0.1f, 0.1f);
 	pointLightCount++;
+
+	unsigned int spotLightCount = 0;
+	/*spotLights[0] = SpotLight(1.0f, 1.0f, 1.0f,
+		0.0f, 1.0f,
+		0.0f, 0.0f, 0.0f,
+		0.0f, -1.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		20.0f);
+
+	spotLightCount++;*/
+
+	spotLights[1] = SpotLight(1.0f, 1.0f, 1.0f,
+		0.0f, 1.0f,
+		0.0f, -0.3f, 0.0f,
+		-100.0f, -1.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		20.0f);
+
+	spotLightCount++;
 
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformShininess = 0, uniformSpecularIntensity = 0, uniformEyePos = 0;                                                                                    
 
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.getBufferWidth() / (GLfloat)mainWindow.getBufferHeight(), 0.1f, 100.0f);
+
 
 	// Loop until window closes
 	while (!mainWindow.getShouldClose()) // which window should close
@@ -196,16 +234,18 @@ int main()
 		uniformSpecularIntensity = shaderList[0].GetSpecularIntensityLocation();
 		uniformShininess = shaderList[0].GetShininessLocation();
 
-	
-
+		glm::vec3 lowerLight = camera.getCamPos();
+		lowerLight.y -= 0.3f;
+		spotLights[0].SetFlash(lowerLight, camera.getCameraDirection());
 		shaderList[0].SetDirectionalLight(&mainLight);
 		shaderList[0].SetPointLights(pointLights, pointLightCount);
+		shaderList[0].SetSpotLights(spotLights, spotLightCount);
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
 		glUniform3f(uniformEyePos, camera.getCamPos().x, camera.getCamPos().y, camera.getCamPos().z);
 		glm::mat4 model(1.0f);
 		
-		
+		/*
 		// position of rotation is relative to the position of the object
 		model = glm::translate(model, glm::vec3(0.0f, 2.0f, -2.5f));
 		
@@ -225,16 +265,23 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		dirt.UseTexture();
 		dullMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
-		meshList[1]->RenderMesh();
+		meshList[1]->RenderMesh();*/
 
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
 		//model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		plain.UseTexture();
+		dirt.UseTexture();
 		dullMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		meshList[2]->RenderMesh();
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		shinyMaterial.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		heli.RenderModel();
 
 
 		Shader::ResetShader();

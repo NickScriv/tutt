@@ -8,11 +8,13 @@ class Texture
 public:
 
 	Texture();
-	Texture(char* file);
+	Texture(const char* file);
 	~Texture();
 
 
-	void LoadTexture();
+	bool LoadTexture();
+	// with alpha channel
+	bool LoadTextureA();
 	void UseTexture();
 	void ClearTexture();
 
@@ -20,7 +22,7 @@ private:
 	GLuint textureID;
 	int width, height, bitDepth;
 
-	char* fileLoc;
+	const char* fileLoc;
 
 
 };

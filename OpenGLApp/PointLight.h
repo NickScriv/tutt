@@ -9,7 +9,7 @@ public:
 	~PointLight();
 	void UseLight(GLfloat ambientIntensityLoc, GLfloat ambientColorLoc, GLfloat diffuseIntesnityLoc, GLfloat positionLocation, GLfloat conLocation, GLfloat linLocation, GLfloat expLocation);
 
-private:
+protected:
 	glm::vec3 position;
 
 	GLfloat constant, linear, exponent;
