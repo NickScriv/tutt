@@ -61,6 +61,7 @@ void Model::ClearModel()
 
 Model::~Model()
 {
+	ClearModel();
 }
 
 void Model::LoadNode(aiNode * node, const aiScene * scene)

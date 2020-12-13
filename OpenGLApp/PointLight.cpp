@@ -8,7 +8,7 @@ PointLight::PointLight() : Light()
 	exponent = 0.0f;
 }
 
-PointLight::PointLight(GLfloat red, GLfloat green, GLfloat blue, GLfloat aIntesnity, GLfloat dIntensity, GLfloat xPos, GLfloat yPos, GLfloat zPos, GLfloat con, GLfloat lin, GLfloat exp) : Light(red, green, blue, aIntesnity, dIntensity)
+PointLight::PointLight(GLfloat red, GLfloat green, GLfloat blue, GLfloat aIntesnity, GLfloat dIntensity, GLfloat xPos, GLfloat yPos, GLfloat zPos, GLfloat con, GLfloat lin, GLfloat exp) : Light(1024, 1024,  red, green, blue, aIntesnity, dIntensity)
 {
 	position = glm::vec3(xPos, yPos, zPos);
 	constant = con;

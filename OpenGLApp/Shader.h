@@ -8,6 +8,8 @@
 #include "PointLight.h"
 #include "CommomValues.h"
 #include "SpotLight.h"
+#include <glm/gtc/type_ptr.hpp>  
+#include <glm/glm.hpp>  
 class Shader
 {
 public:
@@ -31,7 +33,9 @@ public:
 	void SetDirectionalLight(DirectionalLight * dLight);
 	void SetPointLights(PointLight *pLight, unsigned int lightCount);
 	void SetSpotLights(SpotLight *sLight, unsigned int lightCount);
-
+	void SetTexture (GLuint textureUnit);
+	void SetDirectionalMap(GLuint textureUnit);
+	void SetDirectionalLightTransform(glm::mat4 * transform);
 
 	// unassigns current shader
 	static void ResetShader()
@@ -51,6 +55,9 @@ private:
 	GLuint uniformSpecularIntensity, uniformShininess, uniformEyePos;
 	GLuint uniformPointLightCount;
 	GLuint uniformSpotLightCount;
+	GLuint uniformDirectionalLightTransform;
+	GLuint uniformDirectionalShadowMap;
+	GLuint uniformTexture;
 
 	struct {
 		GLuint uniformColor;
